@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using API.Core;
@@ -12,13 +13,18 @@ namespace API.Controllers
 	[ApiController]
 	public class DeviceController : ControllerBase
 	{
+		private const string _DeviceManagerRole = "device_manager"; // todo: this should not be here
+
 		private readonly IRequestContext _requestContext;
 		private readonly IDeviceService _deviceService;
+		private readonly IUserService _userService;
 
-		public DeviceController(IRequestContext requestContext, IDeviceService deviceService)
+		public DeviceController(IRequestContext requestContext, IDeviceService deviceService,
+			IUserService userService)
 		{
 			_requestContext = requestContext;
 			_deviceService = deviceService;
+			_userService = userService;
 		}
 
 		[HttpGet("type")]
@@ -67,13 +73,25 @@ namespace API.Controllers
 		[HttpPost("{deviceId:int}/enable")]
 		public async Task EnableDevice(int deviceId)
 		{
-			await _deviceService.ChangeDeviceStatus(deviceId, DeviceStatus.Active);
+			// todo: merge with "DisableDevice"
+			// todo: move authorization to middleware
+			if (await _userService.UserHasRole(_requestContext.User.Id, _DeviceManagerRole))
+			{
+				await _deviceService.ChangeDeviceStatus(deviceId, DeviceStatus.Active);
+				return;
+			}
+			throw new UnauthorizedAccessException($"Operation is not allowed for user {_requestContext.User.Id}");
 		}
 
 		[HttpPost("{deviceId:int}/disable")]
 		public async Task DisableDevice(int deviceId)
 		{
-			await _deviceService.ChangeDeviceStatus(deviceId, DeviceStatus.Disabled);
+			if (await _userService.UserHasRole(_requestContext.User.Id, _DeviceManagerRole))
+			{
+				await _deviceService.ChangeDeviceStatus(deviceId, DeviceStatus.Disabled);
+				return;
+			}
+			throw new UnauthorizedAccessException($"Operation is not allowed for user {_requestContext.User.Id}");
 		}
 	}
 }

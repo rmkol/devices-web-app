@@ -8,7 +8,9 @@ namespace API.Data
 {
 	public interface IDevicesDbContext
 	{
+		DbSet<Role> Roles { get; set; }
 		DbSet<User> Users { get; set; }
+		DbSet<UserRole> UserRoles { get; set; }
 		DbSet<Token> Tokens { get; set; }
 		DbSet<Device> Devices { get; set; }
 		DbSet<DeviceDetails> DeviceDetails { get; set; }
@@ -18,12 +20,15 @@ namespace API.Data
 
 		EntityEntry<TEntity> Add<TEntity>(TEntity entity) where TEntity : class;
 
-		Task<EntityEntry<TEntity>> AddAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default) where TEntity : class;
+		Task<EntityEntry<TEntity>> AddAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default)
+			where TEntity : class;
 	}
 
 	public class DevicesDbContext : DbContext, IDevicesDbContext
 	{
+		public DbSet<Role> Roles { get; set; }
 		public DbSet<User> Users { get; set; }
+		public DbSet<UserRole> UserRoles { get; set; }
 		public DbSet<Token> Tokens { get; set; }
 		public DbSet<Device> Devices { get; set; }
 		public DbSet<DeviceDetails> DeviceDetails { get; set; }
@@ -34,7 +39,7 @@ namespace API.Data
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			optionsBuilder.UseNpgsql("Host=localhost;Database=postgres;Username=postgres;Password="); // todo rk move to config?
+			optionsBuilder.UseNpgsql("Host=localhost;Database=postgres;Username=postgres;Password="); // todo: move to config
 
 			base.OnConfiguring(optionsBuilder);
 		}
@@ -43,8 +48,18 @@ namespace API.Data
 		{
 			base.OnModelCreating(modelBuilder);
 
+			modelBuilder.Entity<Role>(
+				builder => { builder.ToTable("role", "devices"); });
+
 			modelBuilder.Entity<User>(
 				builder => { builder.ToTable("user", "devices"); });
+
+			modelBuilder.Entity<UserRole>(
+				builder =>
+				{
+					builder.ToTable("user_role", "devices");
+					builder.HasKey(ur => new { ur.UserId, ur.RoleId });
+				});
 
 			modelBuilder.Entity<Token>(
 				builder => { builder.ToTable("token", "devices"); });

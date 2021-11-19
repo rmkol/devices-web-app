@@ -57,12 +57,12 @@ namespace API.Services
 				Name = dto.Name,
 				TypeId = dTypeId.Value,
 				Status = (DeviceStatus)Enum.Parse(typeof(DeviceStatus), dto.Status),
-				DeviceDetails = new DeviceDetails
+				DeviceDetails = new DeviceDetails // NOTE: this is needed because of table split
 				{
 					Name = dto.Name,
 					Description = dto.Description,
 					TypeId = dTypeId.Value,
-					Status = (DeviceStatus)Enum.Parse(typeof(DeviceStatus), dto.Status) // todo rk need this?
+					Status = (DeviceStatus)Enum.Parse(typeof(DeviceStatus), dto.Status)
 				}
 			};
 

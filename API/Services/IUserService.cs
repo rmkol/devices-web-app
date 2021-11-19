@@ -8,5 +8,6 @@ namespace API.Services
 		Task<UserDto> GetUserByIdAsync(int userId);
 		Task<int> RegisterUserAsync(UserDto dto);
 		Task<TokenDto> AuthenticateUserAsync(UserDto dto);
+		Task<bool> UserHasRole(int userId, string roleName);
 	}
 }

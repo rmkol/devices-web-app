@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,10 +40,10 @@ namespace API.Services
 				FirstName = dto.FirstName,
 				LastName = dto.LastName
 			};
-			
+
 			await _db.Users.AddAsync(user);
 			await _db.SaveChangesAsync();
-			
+
 			return user.Id;
 		}
 
@@ -59,6 +60,15 @@ namespace API.Services
 
 			var token = await _tokenService.IssueNewTokenForUser(user);
 			return new TokenDto { Token = token.Value, ExpiresInSec = token.TtlSec };
+		}
+
+		public async Task<bool> UserHasRole(int userId, string roleName)
+		{
+			return await (from u in _db.Users
+						  join ur in _db.UserRoles on u.Id equals ur.UserId
+						  join r in _db.Roles on ur.RoleId equals r.Id
+						  where u.Id == userId && r.Name == roleName
+						  select r).AnyAsync();
 		}
 
 		private static string ComputeSha256Hash(string str)

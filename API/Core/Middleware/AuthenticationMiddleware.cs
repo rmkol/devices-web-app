@@ -24,7 +24,7 @@ namespace API.Core.Middleware
 				var token = await tokenService.GetTokenByValue(tokenStr);
 				if (token != null && !token.IsExpired)
 				{
-					var userDto = await userService.GetUserByIdAsync(token.UserId); // todo rk rewrite; make service return entity instead of dto?
+					var userDto = await userService.GetUserByIdAsync(token.UserId);
 					requestContext.User = new User { Id = userDto.Id.Value };
 					await _next.Invoke(context);
 				}
