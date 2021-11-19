@@ -2,7 +2,7 @@ using API.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace API.MVC.Filters
+namespace API.Core.Filters
 {
 	public class CommonExceptionFilter : IActionFilter, IOrderedFilter
 	{
@@ -22,6 +22,13 @@ namespace API.MVC.Filters
 			if (context.Exception is EntityNotFoundException enfEx)
 			{
 				context.Result = new NotFoundObjectResult(enfEx.ErrorMessage);
+				context.ExceptionHandled = true;
+				return;
+			}
+
+			if (context.Exception is BadCredentialsException bcEx)
+			{
+				context.Result = new UnauthorizedObjectResult(bcEx.ErrorMessage);
 				context.ExceptionHandled = true;
 				return;
 			}

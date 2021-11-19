@@ -7,12 +7,13 @@ namespace API.Services
 {
 	public interface IDeviceService
 	{
-		Task<IEnumerable<DeviceDto>> GetAllAsync();
-		Task<DeviceDetailsDto> GetByIdAsync(int id);
-		Task<int> AddAsync(DeviceDetailsDto dto);
-		Task UpdateAsync(int deviceId, DeviceDetailsDto dto);
-		Task DeleteAsync(int deviceId);
+		Task<IEnumerable<DeviceDto>> GetAllDevicesAsync();
+		Task<DeviceDetailsDto> GetDeviceByIdAsync(int id);
+		Task<int> AddDeviceAsync(DeviceDetailsDto dto);
+		Task UpdateDeviceAsync(int deviceId, DeviceDetailsDto dto);
+		Task DeleteDeviceAsync(int deviceId);
 		Task<IEnumerable<DeviceDto>> SearchDevicesByName(string name);
 		Task ChangeDeviceStatus(int deviceId, DeviceStatus status);
+		Task<IEnumerable<DeviceTypeDto>> GetAllDeviceTypes();
 	}
 }

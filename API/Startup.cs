@@ -1,5 +1,7 @@
-﻿using API.Data;
-using API.MVC.Filters;
+﻿using API.Core;
+using API.Core.Filters;
+using API.Core.Middleware;
+using API.Data;
 using API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -40,6 +42,13 @@ namespace API
 				app.UseHsts();
 			}
 
+			app.UseWhen(
+				context => !context.Request.Path.StartsWithSegments("/api/user"),
+				appBuilder =>
+				{
+					appBuilder.UseMiddleware<AuthenticationMiddleware>();
+				}
+			);
 			app.UseHttpsRedirection();
 			app.UseMvc();
 		}
@@ -51,7 +60,11 @@ namespace API
 
 		private static void RegisterServiceClasses(IServiceCollection services)
 		{
+			services.AddScoped<IRequestContext, RequestContext>();
+			services.AddScoped<IDevicesDbContext, DevicesDbContext>();
 			services.AddScoped<IDeviceService, DeviceService>();
+			services.AddScoped<IUserService, UserService>();
+			services.AddScoped<ITokenService, TokenService>();
 		}
 	}
 }

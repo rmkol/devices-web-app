@@ -5,7 +5,14 @@ namespace API.Extensions
 {
 	public static class ModelDtoExtensions
 	{
-		#region Device Type
+		public static UserDto ToDto(this User user)
+		{
+			return new UserDto(id: user.Id,
+				emailAddress: user.EmailAddress,
+				firstName: user.FirstName,
+				lastName: user.LastName,
+				password: null);
+		}
 
 		public static DeviceTypeDto ToDto(this DeviceType deviceType)
 		{
@@ -13,10 +20,6 @@ namespace API.Extensions
 				name: deviceType.Name,
 				description: deviceType.Description);
 		}
-
-		#endregion Device Type
-
-		#region Device
 
 		public static DeviceDto ToDto(this Device device, DeviceType deviceType)
 		{
@@ -26,18 +29,15 @@ namespace API.Extensions
 				status: device.Status?.ToString());
 		}
 
-		#endregion Device
-
-		#region Device Details
-
 		public static DeviceDetailsDto ToDto(this DeviceDetails details, DeviceType deviceType)
 		{
-			return new DeviceDetailsDto(id: details.Id, name: details.Name,
-				type: deviceType?.ToDto(), status: details.Status?.ToString(),
-				description: details.Description, createdTimestamp: details.CreatedTimestamp,
+			return new DeviceDetailsDto(id: details.Id,
+				name: details.Name,
+				type: deviceType?.ToDto(),
+				status: details.Status?.ToString(),
+				description: details.Description,
+				createdTimestamp: details.CreatedTimestamp,
 				updatedTimestamp: details.UpdatedTimestamp);
 		}
-
-		#endregion Device Details
 	}
 }

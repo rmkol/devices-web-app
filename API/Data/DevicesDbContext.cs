@@ -8,6 +8,8 @@ namespace API.Data
 {
 	public interface IDevicesDbContext
 	{
+		DbSet<User> Users { get; set; }
+		DbSet<Token> Tokens { get; set; }
 		DbSet<Device> Devices { get; set; }
 		DbSet<DeviceDetails> DeviceDetails { get; set; }
 		DbSet<DeviceType> DeviceTypes { get; set; }
@@ -21,6 +23,8 @@ namespace API.Data
 
 	public class DevicesDbContext : DbContext, IDevicesDbContext
 	{
+		public DbSet<User> Users { get; set; }
+		public DbSet<Token> Tokens { get; set; }
 		public DbSet<Device> Devices { get; set; }
 		public DbSet<DeviceDetails> DeviceDetails { get; set; }
 		public DbSet<DeviceType> DeviceTypes { get; set; }
@@ -30,7 +34,7 @@ namespace API.Data
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			optionsBuilder.UseNpgsql("Host=localhost;Database=postgres;Username=postgres;Password=");
+			optionsBuilder.UseNpgsql("Host=localhost;Database=postgres;Username=postgres;Password="); // todo rk move to config?
 
 			base.OnConfiguring(optionsBuilder);
 		}
@@ -38,6 +42,12 @@ namespace API.Data
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
+
+			modelBuilder.Entity<User>(
+				builder => { builder.ToTable("user", "devices"); });
+
+			modelBuilder.Entity<Token>(
+				builder => { builder.ToTable("token", "devices"); });
 
 			modelBuilder.Entity<DeviceType>(
 				builder => { builder.ToTable("device_type", "devices"); });

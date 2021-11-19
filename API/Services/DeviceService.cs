@@ -18,14 +18,14 @@ namespace API.Services
 			_db = db;
 		}
 
-		public async Task<IEnumerable<DeviceDto>> GetAllAsync()
+		public async Task<IEnumerable<DeviceDto>> GetAllDevicesAsync()
 		{
 			return await (from d in _db.Devices
 						  join dt in _db.DeviceTypes on d.TypeId equals dt.Id
 						  select d.ToDto(dt)).ToListAsync();
 		}
 
-		public async Task<DeviceDetailsDto> GetByIdAsync(int id)
+		public async Task<DeviceDetailsDto> GetDeviceByIdAsync(int id)
 		{
 			return await (from dd in _db.DeviceDetails
 						  join dt in _db.DeviceTypes on dd.TypeId equals dt.Id
@@ -33,7 +33,7 @@ namespace API.Services
 						  select dd.ToDto(dt)).FirstOrDefaultAsync();
 		}
 
-		public async Task<int> AddAsync(DeviceDetailsDto dto)
+		public async Task<int> AddDeviceAsync(DeviceDetailsDto dto)
 		{
 			ValidateDeviceDetailsForAddUpdate(dto);
 
@@ -57,7 +57,7 @@ namespace API.Services
 			return deviceDetails.Id;
 		}
 
-		public async Task UpdateAsync(int deviceId, DeviceDetailsDto dto)
+		public async Task UpdateDeviceAsync(int deviceId, DeviceDetailsDto dto)
 		{
 			ValidateDeviceDetailsForAddUpdate(dto);
 
@@ -78,7 +78,7 @@ namespace API.Services
 			await _db.SaveChangesAsync();
 		}
 
-		public async Task DeleteAsync(int deviceId)
+		public async Task DeleteDeviceAsync(int deviceId)
 		{
 			var device = await GetDeviceById(deviceId);
 
@@ -108,6 +108,12 @@ namespace API.Services
 			}
 			device.Status = status;
 			await _db.SaveChangesAsync();
+		}
+
+		public async Task<IEnumerable<DeviceTypeDto>> GetAllDeviceTypes()
+		{
+			return await (from dt in _db.DeviceTypes
+						  select dt.ToDto()).ToListAsync();
 		}
 
 		private async Task<Device> GetDeviceById(int deviceId)

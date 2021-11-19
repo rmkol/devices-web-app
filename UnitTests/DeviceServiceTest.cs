@@ -40,7 +40,7 @@ namespace UnitTests
 		[Test]
 		public async Task CreateDevice()
 		{
-			var deviceId = await _service.AddAsync(new DeviceDetailsDto
+			var deviceId = await _service.AddDeviceAsync(new DeviceDetailsDto
 			{
 				Name = "Device 1",
 				Type = new DeviceTypeDto { Id = 1 }
@@ -69,7 +69,7 @@ namespace UnitTests
 				}
 			);
 
-			var result = await _service.GetByIdAsync(deviceTypeId);
+			var result = await _service.GetDeviceByIdAsync(deviceTypeId);
 			Assert.AreEqual(deviceId, result.Id);
 			Assert.AreEqual(deviceName, result.Name);
 			Assert.AreEqual(DeviceStatus.Disabled.ToString(), result.Status);
@@ -85,17 +85,17 @@ namespace UnitTests
 		[Test]
 		public void CreateDevice_EmptyName()
 		{
-			Assert.ThrowsAsync<InvalidArgumentException>(() => _service.AddAsync(new DeviceDetailsDto
+			Assert.ThrowsAsync<InvalidArgumentException>(() => _service.AddDeviceAsync(new DeviceDetailsDto
 			{
 				Name = null,
 				Type = new DeviceTypeDto { Id = 1 }
 			}));
-			Assert.ThrowsAsync<InvalidArgumentException>(() => _service.AddAsync(new DeviceDetailsDto
+			Assert.ThrowsAsync<InvalidArgumentException>(() => _service.AddDeviceAsync(new DeviceDetailsDto
 			{
 				Name = "",
 				Type = new DeviceTypeDto { Id = 1 }
 			}));
-			Assert.ThrowsAsync<InvalidArgumentException>(() => _service.AddAsync(new DeviceDetailsDto
+			Assert.ThrowsAsync<InvalidArgumentException>(() => _service.AddDeviceAsync(new DeviceDetailsDto
 			{
 				Name = " ",
 				Type = new DeviceTypeDto { Id = 1 }
