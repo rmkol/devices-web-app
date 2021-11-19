@@ -1,6 +1,6 @@
 # Devices REST API
 
-Test project implemented using .NET Core 2.2 and Postgres database.
+Test project implemented using .NET Core 2.2 and Postgres 14 database.
 
 ## Project Structure
 
