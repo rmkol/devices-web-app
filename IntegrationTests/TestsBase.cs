@@ -16,17 +16,44 @@ namespace Tests
 			HttpClient = new HttpClient();
 		}
 
-		protected string HttpPost<TBody>(string url, TBody body)
+		protected void LogStep(string step)
+		{
+			Console.Out.WriteLine($"--> {step} <--");
+		}
+
+		protected string HttpPost(string url, object body)
 		{
 			var response = HttpClient.PostAsync(url,
-				new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8,
-					"application/json"));
-			if (response.Result.IsSuccessStatusCode)
+				new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")).Result;
+			if (response.IsSuccessStatusCode)
 			{
-				return response.Result.Content.ReadAsStringAsync().Result;
+				return response.Content.ReadAsStringAsync().Result;
 			}
-			throw new ApplicationException($"POST \"{url}\" returned bad status code - {response.Result.StatusCode}. " +
-										   $"Error: {response.Result.Content.ReadAsStringAsync().Result}");
+			throw new ApplicationException($"POST \"{url}\" returned bad status code - {response.StatusCode}. " +
+										   $"Error: {response.Content.ReadAsStringAsync().Result}");
+		}
+
+		protected string HttpPut<TBody>(string url, TBody body)
+		{
+			var response = HttpClient.PutAsync(url,
+				new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")).Result;
+			if (response.IsSuccessStatusCode)
+			{
+				return response.Content.ReadAsStringAsync().Result;
+			}
+			throw new ApplicationException($"PUT \"{url}\" returned bad status code - {response.StatusCode}. " +
+										   $"Error: {response.Content.ReadAsStringAsync().Result}");
+		}
+
+		protected string HttpDelete(string url)
+		{
+			var response = HttpClient.DeleteAsync(url).Result;
+			if (response.IsSuccessStatusCode)
+			{
+				return response.Content.ReadAsStringAsync().Result;
+			}
+			throw new ApplicationException($"DELETE \"{url}\" returned bad status code - {response.StatusCode}. " +
+										   $"Error: {response.Content.ReadAsStringAsync().Result}");
 		}
 
 		protected TReply HttpGet<TReply>(string url)

@@ -26,7 +26,7 @@ namespace API.Extensions
 			return new DeviceDto(id: device.Id,
 				name: device.Name,
 				type: deviceType?.ToDto(),
-				status: device.Status?.ToString());
+				status: device.Status.ToString());
 		}
 
 		public static DeviceDetailsDto ToDto(this DeviceDetails details, DeviceType deviceType)
@@ -34,7 +34,7 @@ namespace API.Extensions
 			return new DeviceDetailsDto(id: details.Id,
 				name: details.Name,
 				type: deviceType?.ToDto(),
-				status: details.Status?.ToString(),
+				status: details.Status.ToString(),
 				description: details.Description,
 				createdTimestamp: details.CreatedTimestamp,
 				updatedTimestamp: details.UpdatedTimestamp);

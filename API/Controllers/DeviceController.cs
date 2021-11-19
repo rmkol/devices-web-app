@@ -21,6 +21,12 @@ namespace API.Controllers
 			_deviceService = deviceService;
 		}
 
+		[HttpGet("type")]
+		public async Task<IEnumerable<DeviceTypeDto>> GetAllDeviceTypes()
+		{
+			return await _deviceService.GetAllDeviceTypes();
+		}
+
 		[HttpGet]
 		public async Task<IEnumerable<DeviceDto>> GetAllDevices()
 		{
@@ -34,10 +40,9 @@ namespace API.Controllers
 		}
 
 		[HttpPost]
-		public async Task<DeviceDetailsDto> CreateDevice(DeviceDetailsDto dto)
+		public async Task<int> CreateDevice(DeviceDetailsDto dto)
 		{
-			var deviceId = await _deviceService.AddDeviceAsync(dto);
-			return await _deviceService.GetDeviceByIdAsync(deviceId);
+			return await _deviceService.AddDeviceAsync(dto);
 		}
 
 		[HttpPut("{deviceId:int}")]
@@ -59,13 +64,13 @@ namespace API.Controllers
 			return await _deviceService.SearchDevicesByName(name);
 		}
 
-		[HttpPost("enable{deviceId:int}")]
+		[HttpPost("{deviceId:int}/enable")]
 		public async Task EnableDevice(int deviceId)
 		{
 			await _deviceService.ChangeDeviceStatus(deviceId, DeviceStatus.Active);
 		}
 
-		[HttpPost("disable{deviceId:int}")]
+		[HttpPost("{deviceId:int}/disable")]
 		public async Task DisableDevice(int deviceId)
 		{
 			await _deviceService.ChangeDeviceStatus(deviceId, DeviceStatus.Disabled);

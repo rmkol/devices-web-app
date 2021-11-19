@@ -17,6 +17,6 @@ namespace API.Data
 		public int TypeId { get; set; }
 
 		[Required] [Column("status")]
-		public DeviceStatus? Status { get; set; }
+		public DeviceStatus Status { get; set; }
 	}
 }

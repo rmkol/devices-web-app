@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using API.DTO;
 using API.Exceptions;
 using API.Extensions;
 using Microsoft.EntityFrameworkCore;
+using static System.String;
 
 namespace API.Services
 {
@@ -22,6 +24,7 @@ namespace API.Services
 		{
 			return await (from d in _db.Devices
 						  join dt in _db.DeviceTypes on d.TypeId equals dt.Id
+						  where d.Status != DeviceStatus.Deleted
 						  select d.ToDto(dt)).ToListAsync();
 		}
 
@@ -29,7 +32,7 @@ namespace API.Services
 		{
 			return await (from dd in _db.DeviceDetails
 						  join dt in _db.DeviceTypes on dd.TypeId equals dt.Id
-						  where dd.Id == id
+						  where dd.Id == id && dd.Status != DeviceStatus.Deleted
 						  select dd.ToDto(dt)).FirstOrDefaultAsync();
 		}
 
@@ -44,17 +47,29 @@ namespace API.Services
 				throw new InvalidArgumentException($"Device type {dTypeId} doesn't exist.");
 			}
 
-			var deviceDetails = new DeviceDetails
+			if (IsNullOrEmpty(dto.Status))
+			{
+				dto.Status = DeviceStatus.Disabled.ToString();
+			}
+
+			var device = new Device
 			{
 				Name = dto.Name,
-				Description = dto.Description,
-				TypeId = dTypeId.Value
+				TypeId = dTypeId.Value,
+				Status = (DeviceStatus)Enum.Parse(typeof(DeviceStatus), dto.Status),
+				DeviceDetails = new DeviceDetails
+				{
+					Name = dto.Name,
+					Description = dto.Description,
+					TypeId = dTypeId.Value,
+					Status = (DeviceStatus)Enum.Parse(typeof(DeviceStatus), dto.Status) // todo rk need this?
+				}
 			};
 
-			await _db.AddAsync(deviceDetails);
+			await _db.AddAsync(device);
 			await _db.SaveChangesAsync();
 
-			return deviceDetails.Id;
+			return device.Id;
 		}
 
 		public async Task UpdateDeviceAsync(int deviceId, DeviceDetailsDto dto)
@@ -81,21 +96,18 @@ namespace API.Services
 		public async Task DeleteDeviceAsync(int deviceId)
 		{
 			var device = await GetDeviceById(deviceId);
-
 			device.Status = DeviceStatus.Deleted;
-			// todo rk delete child devices as well? if any
-
 			await _db.SaveChangesAsync();
 		}
 
 		public async Task<IEnumerable<DeviceDto>> SearchDevicesByName(string name)
 		{
-			if (string.IsNullOrWhiteSpace(name)) return Enumerable.Empty<DeviceDto>();
+			if (IsNullOrWhiteSpace(name)) return Enumerable.Empty<DeviceDto>();
 
 			name = name.ToLower();
 			return await (from d in _db.Devices
 						  join dt in _db.DeviceTypes on d.TypeId equals dt.Id
-						  where d.Name.ToLower().Contains(name)
+						  where d.Status != DeviceStatus.Deleted && d.Name.ToLower().Contains(name)
 						  select d.ToDto(dt)).ToListAsync();
 		}
 
@@ -128,7 +140,7 @@ namespace API.Services
 
 		private static void ValidateDeviceDetailsForAddUpdate(DeviceDetailsDto dto)
 		{
-			if (string.IsNullOrWhiteSpace(dto.Name))
+			if (IsNullOrWhiteSpace(dto.Name))
 			{
 				throw new InvalidArgumentException("Device name cannot be empty.");
 			}
